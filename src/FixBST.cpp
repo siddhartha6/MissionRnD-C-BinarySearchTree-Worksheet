@@ -31,62 +31,73 @@ struct node{
 	int data;
 	struct node *right;
 };
-void quicksort(int *x, int first, int last){
-	int pivot, j, temp, i;
+
+void quicksort(int *array, int first, int last){
+	
+	int pivot=0, index1=0, temp=0, index2=0;
 
 	if (first<last){
 		pivot = first;
-		i = first;
-		j = last;
+		index1 = first;
+		index2 = last;
 
-		while (i<j){
-			while (x[i] <= x[pivot] && i<last)
-				i++;
-			while (x[j]>x[pivot])
-				j--;
-			if (i<j){
-				temp = x[i];
-				x[i] = x[j];
-				x[j] = temp;
+		while (index1<index2){
+			while (array[index1] <= array[pivot] && index1<last)
+				index1++;
+			while (array[index2]>array[pivot])
+				index2--;
+			if (index1<index2){
+				temp = array[index1];
+				array[index1] = array[index2];
+				array[index2] = temp;
 			}
 		}
 
-		temp = x[pivot];
-		x[pivot] = x[j];
-		x[j] = temp;
-		quicksort(x, first, j - 1);
-		quicksort(x, j + 1, last);
+		temp = array[pivot];
+		array[pivot] = array[index2];
+		array[index2] = temp;
+		quicksort(array, first, index2 - 1);
+		quicksort(array, index2 + 1, last);
 
 	}
 }
-void inorder_traversal1(struct node *root, int *arr, int *index){
+int tree_size(struct node* root)
+{
+	if (root == NULL)
+		return 0;
+	else
+		return(tree_size(root->left) + tree_size(root->right) + 1);
+}
+void inorder_array(struct node *root, int *elements, int *index){
 	if (root != NULL)
 	{
-		inorder_traversal1(root->left, arr, index);
+		inorder_array(root->left, elements, index);
 		*index = *index + 1;
-		arr[*index] = root->data;
-		inorder_traversal1(root->right, arr, index);
+		elements[*index] = root->data;
+		inorder_array(root->right, elements, index);
 	}
 }
-void setTreedata(struct node* root, int *arr, int* index1){
-	if (root == NULL)return;
-	setTreedata(root->left, arr, index1);
-	root->data = arr[*index1];
-	*index1 = *index1 + 1;
-	setTreedata(root->right, arr, index1);
+void inorder_tree(struct node* root, int *elements, int* index){
+	if (root != NULL)
+	{
+		inorder_tree(root->left, elements, index);
+		*index = *index + 1;
+		root->data = elements[*index];
+		inorder_tree(root->right, elements, index);
+	}
 }
+
 void fix_bst(struct node *root){
 
 	if (root != NULL)
 	{
 		int index = -1, i = 0;
-		int *arr = (int *)malloc(10 * sizeof(int));
-		inorder_traversal1(root, arr, &index);
-		quicksort(arr, 0, sizeof(arr) - 1);
-		//int size = sizeof(arr);
-		int index1 = 0;
-		setTreedata(root, arr,&index1);
-
-		//display(arr, sizeof(arr));
+		int no_elements = tree_size(root);
+		int *elements = (int *)malloc(no_elements* sizeof(int));
+		inorder_array(root, elements, &index);
+		quicksort(elements, 0, no_elements- 1);
+		index = -1;
+		inorder_tree(root,elements,&index);
 	}
+
 }
